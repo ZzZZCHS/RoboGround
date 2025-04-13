@@ -1,0 +1,15 @@
+[submodule "robomimic"]
+	path = robomimic
+	url = https://github.com/ZzZZCHS/robomimic_robocasa
+[submodule "robosuite"]
+	path = robosuite
+	url = https://github.com/ZzZZCHS/robosuite_robocasa
+[submodule "robocasa"]
+	path = robocasa
+	url = https://github.com/ZzZZCHS/robocasa
+[submodule "GR1"]
+	path = GR1
+	url = https://github.com/ZzZZCHS/GR1
+[submodule "groundingLMM"]
+	path = groundingLMM
+	url = https://github.com/ZzZZCHS/groundingLMM
