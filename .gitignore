@@ -172,3 +172,14 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+
+data_gen/gpt/common_results/
+data_gen/gpt/spatial_results/
+data_gen/logs/
+data_gen/api_test.py
+7zip/
+tmp_data/
+robocasa_assets.tar.gz
+robosuite_assets.tar.gz
+data_gen/gpt/api_test.py
