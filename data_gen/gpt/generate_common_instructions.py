@@ -14,48 +14,39 @@ from datetime import datetime
 from scipy.spatial.transform import Rotation as R
 
 def transform_pose(world_obj_pos, world_obj_quat, world_robot_pos, world_robot_quat):
-    # Convert world object position and quaternion to arrays
     world_obj_pos = np.array(world_obj_pos)
     world_obj_quat = np.array(world_obj_quat)
 
-    # Convert world robot position and quaternion to arrays
     world_robot_pos = np.array(world_robot_pos)
     world_robot_quat = np.array(world_robot_quat)
 
-    # Step 1: Compute the inverse of the robot's world pose
-    # Inverse rotation (quaternion)
     robot_rotation_inv = R.from_quat(world_robot_quat).inv()
 
-    # Inverse translation: Rotate the translation part and negate it
     robot_translation_inv = -robot_rotation_inv.apply(world_robot_pos)
 
-    # Step 2: Apply the inverse transformation to the object's world pose
-    # Transform position
     obj_pos_in_robot_frame = robot_rotation_inv.apply(world_obj_pos + robot_translation_inv)
 
-    # Transform orientation
     obj_rotation_in_world = R.from_quat(world_obj_quat)
     obj_rotation_in_robot_frame = robot_rotation_inv * obj_rotation_in_world
 
-    # Get quaternion for object's orientation in robot base frame
     obj_quat_in_robot_frame = obj_rotation_in_robot_frame.as_quat()
 
     return obj_pos_in_robot_frame, obj_quat_in_robot_frame
 
-# 生成带时间戳的日志文件名
+
 current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 log_filename = f'./logs/output_{current_time}.log'
 
-# 配置日志设置
+
 logging.basicConfig(
-    filename=log_filename,  # 设置日志文件名
-    filemode='w',           # 以写模式打开（每次运行会覆盖旧日志）
-    level=logging.INFO,     # 设置日志级别
-    format='%(asctime)s - %(levelname)s - %(message)s'  # 设置日志格式
+    filename=log_filename,
+    filemode='w',
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
 def encode_image_to_base64(image):
-    _, buffer = cv2.imencode('.jpg', image)  # Assumes OpenCV; adjust if needed
+    _, buffer = cv2.imencode('.jpg', image)
     return base64.b64encode(buffer).decode('utf-8')
 
 def save_to_json(data, filename):
@@ -73,11 +64,11 @@ def isvalid(pos_a, pos_b):
 # directory_path = "/mnt/hwfile/OpenRobotLab/huanghaifeng/data/generated_data"
 # file_paths = [os.path.join(directory_path, f) for f in os.listdir(directory_path) if f.endswith('.hdf5')]
 file_paths = [
-    # '/ailab/user/chenxinyi1/group/haifeng/robocasa_exps_haifeng/robocasa/datasets/v0.1/generated_0412/PnPCabToCounter.hdf5',
-    # '/ailab/user/chenxinyi1/group/haifeng/robocasa_exps_haifeng/robocasa/datasets/v0.1/generated_0412/PnPCounterToCab.hdf5',
-    # '/ailab/user/chenxinyi1/group/haifeng/robocasa_exps_haifeng/robocasa/datasets/v0.1/generated_0412/PnPCounterToMicrowave.hdf5',
-    # '/ailab/user/chenxinyi1/group/haifeng/robocasa_exps_haifeng/robocasa/datasets/v0.1/generated_0412/PnPCounterToSink.hdf5',
-    # '/ailab/user/chenxinyi1/group/haifeng/robocasa_exps_haifeng/robocasa/datasets/v0.1/generated_0412/PnPCounterToStove.hdf5',
+    '/ailab/user/chenxinyi1/group/haifeng/robocasa_exps_haifeng/robocasa/datasets/v0.1/generated_0412/PnPCabToCounter.hdf5',
+    '/ailab/user/chenxinyi1/group/haifeng/robocasa_exps_haifeng/robocasa/datasets/v0.1/generated_0412/PnPCounterToCab.hdf5',
+    '/ailab/user/chenxinyi1/group/haifeng/robocasa_exps_haifeng/robocasa/datasets/v0.1/generated_0412/PnPCounterToMicrowave.hdf5',
+    '/ailab/user/chenxinyi1/group/haifeng/robocasa_exps_haifeng/robocasa/datasets/v0.1/generated_0412/PnPCounterToSink.hdf5',
+    '/ailab/user/chenxinyi1/group/haifeng/robocasa_exps_haifeng/robocasa/datasets/v0.1/generated_0412/PnPCounterToStove.hdf5',
     '/ailab/user/chenxinyi1/group/haifeng/robocasa_exps_haifeng/robocasa/datasets/v0.1/generated_0412/PnPMicrowaveToCounter.hdf5',
     '/ailab/user/chenxinyi1/group/haifeng/robocasa_exps_haifeng/robocasa/datasets/v0.1/generated_0412/PnPSinkToCounter.hdf5',
     '/ailab/user/chenxinyi1/group/haifeng/robocasa_exps_haifeng/robocasa/datasets/v0.1/generated_0412/PnPStoveToCounter.hdf5'
@@ -120,7 +111,7 @@ for file_path in file_paths:
     """
 
 
-    output_filename = os.path.join(output_dir, f'output/{env_name}.json')
+    output_filename = os.path.join(output_dir, f'common_results/{env_name}.json')
     logging.info(f"save at {output_filename}")
     cnt = 0
     gen_instructions = dict()
@@ -197,18 +188,16 @@ for file_path in file_paths:
                 mask = f[f'data/{demo_id}/obs/{mask_name}'][0].squeeze()
 
                 mask_rgb = np.zeros((mask.shape[0], mask.shape[1], 3), dtype=np.uint8)
-                mask_rgb[mask[...] == 1] = [255, 0, 0]  # 红色 target_object
-                mask_rgb[mask[...] == 2] = [0, 255, 0]  # 绿色 target_place
+                mask_rgb[mask[...] == 1] = [255, 0, 0]
+                mask_rgb[mask[...] == 2] = [0, 255, 0]
 
-                alpha = 0.7  # 透明度
+                alpha = 0.7
                 combined_image = first_frame * (1 - alpha) + mask_rgb * alpha
                 combined_image = combined_image.astype(np.uint8)
 
                 encoded_images.append(encode_image_to_base64(first_frame))
                 encoded_images.append(encode_image_to_base64(combined_image))
 
-            # todo: 再调一下prompt
-            # 生成common sense的instructions
             try:
                 response = get_response_with_image(
                     image_paths=[],
@@ -226,7 +215,6 @@ for file_path in file_paths:
             logging.info(f'{demo_id}: {target_obj_class}/{target_obj_phrase} -> {target_place_phrase}')
             logging.info(response)
 
-            # 存储
             gen_instructions[demo_name] = demo_item
             print(f"{demo_name} save.")
     

@@ -1,5 +1,5 @@
 # RoboGround
-Code &amp; data for "RoboGround: Robotic Manipulation with Grounded Vision-Language Priors" (CVPR 2025)
+Code &amp; data for "RoboGround: Robotic Manipulation with Grounded Vision-Language Priors" (CVPR 2025) [[Project Page]](https://robo-ground.github.io/)
 
 
 ## 🔨 Environment Setup

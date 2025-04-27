@@ -21,10 +21,8 @@ def pose_to_matrix(position, quaternion):
     """
     Convert position and quaternion (x, y, z, w format) to a 4x4 transformation matrix.
     """
-    # Create a rotation matrix from the quaternion
     rotation_matrix = R.from_quat(quaternion).as_matrix()
 
-    # Create the 4x4 transformation matrix
     transformation_matrix = np.eye(4)
     transformation_matrix[:3, :3] = rotation_matrix
     transformation_matrix[:3, 3] = position
@@ -35,27 +33,21 @@ def matrix_to_pose(matrix):
     """
     Convert a 4x4 transformation matrix back to position and quaternion.
     """
-    # Extract the rotation matrix and convert to quaternion
     rotation_matrix = matrix[:3, :3]
     quaternion = R.from_matrix(rotation_matrix).as_quat()
 
-    # Extract the translation part
     position = matrix[:3, 3]
 
     return position, quaternion
 
 def transform_pose(world_obj_pos, world_obj_quat, world_robot_pos, world_robot_quat):
-    # Step 1: Convert the object and robot poses to 4x4 transformation matrices
     obj_matrix = pose_to_matrix(world_obj_pos, world_obj_quat)
     robot_matrix = pose_to_matrix(world_robot_pos, world_robot_quat)
 
-    # Step 2: Compute the inverse of the robot's transformation matrix
     robot_matrix_inv = np.linalg.inv(robot_matrix)
 
-    # Step 3: Transform the object's pose by the inverse robot transformation
     obj_in_robot_frame_matrix = robot_matrix_inv @ obj_matrix
 
-    # Step 4: Convert the resulting transformation matrix back to position and quaternion
     obj_pos_in_robot_frame, obj_quat_in_robot_frame = matrix_to_pose(obj_in_robot_frame_matrix)
 
     return obj_pos_in_robot_frame, obj_quat_in_robot_frame
@@ -72,7 +64,7 @@ logging.basicConfig(
 
 
 def encode_image_to_base64(image):
-    _, buffer = cv2.imencode('.jpg', image)  # Assumes OpenCV; adjust if needed
+    _, buffer = cv2.imencode('.jpg', image)
     return base64.b64encode(buffer).decode('utf-8')
 
 def save_to_json(data, filename):
@@ -84,7 +76,6 @@ def isvalid(pos_a, pos_b, limit, exclude_idx=-1):
         if index == exclude_idx:
             continue
         
-        # 限制转角小于等于30度
         if abs(pos_a[index] - pos_b[index]) > limit * (1/math.sqrt(3)):
             return False
     return True
