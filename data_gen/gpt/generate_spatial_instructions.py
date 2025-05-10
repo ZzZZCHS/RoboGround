@@ -173,7 +173,10 @@ for file_path in file_paths:
             for name, item in obj_dict.items():
                 obj_list.append(item['class'])
                 pos_dict[item['id']] = item['relative_robot_pos']
-                class_name = ' '.join(item['id'].split('_')[1:-1])
+                if item['id'].startswith('aigen_objs'):
+                    class_name = ' '.join(item['id'].split('_')[2:-1])
+                else:
+                    class_name = ' '.join(item['id'].split('_')[1:-1])
                 occur_num[class_name] += 1
                 id2class[item['id']] = class_name
 

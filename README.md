@@ -73,11 +73,39 @@ Code &amp; data for "RoboGround: Robotic Manipulation with Grounded Vision-Langu
     bash robomimic/scripts/run_visualization.sh /path/to/TASK_NAME.hdf5
     ```
 
+- Data generation:
+
+    We created a custom dataset based on [robocasa's demonstrations](https://robocasa.ai/docs/use_cases/downloading_datasets.html) by introducing object distractors and generating new instructions. 
+
+    - First, add objects and generate appearance-based instructions:
+        ```bash
+        cd robomimic
+        python robomimic/scripts/generate_demos.py \
+            --dataset /path/to/hdf5_data \  # Path to the original HDF5 dataset
+            --n 3000 \  # Number of demonstrations to process (use a small number for debugging)
+            --camera_height 512 --camera_width 512 \  # The size of observation images/masks
+            --save_new_data --save_obs \  # Enable saving of augmented data and observations
+            --write_gt_mask \  # Save ground-truth masks for target objects and placement areas
+            --write_video \  # Save video visualizations if needed
+            --use_actions  # Replay original robot actions
+        ```
+
+    - Once new demonstrations are generated, create corresponding spatial and commonsense instructions. Update the `file_paths` and `output_dir` variables in the following scripts:
+        ```bash
+        cd data_gen/gpt
+        python generate_spatial_instructions.py
+        python generate_common_instructions.py
+        ```
+
+## Training & Evaluation
+Using the generated dataset, we first train a grounded vision-language model (VLM) to detect target objects and placement areas. For implementation details, refer to our groundingLMM [repository](https://github.com/ZzZZCHS/groundingLMM).
+
+Next, we train a robot policy using the GR-1 framework. Full implementation details can be found in our GR-1 [repository](https://github.com/ZzZZCHS/GR1).
 
 ## TODO
 
 - [x] Data release.
-- [ ] Code and instruction for data generation.
+- [x] Code and instruction for data generation.
 - [ ] Code and instruction for model training&evaluation.
 
 ## 😊 Acknowledgement
