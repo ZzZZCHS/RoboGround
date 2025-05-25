@@ -106,7 +106,7 @@ Next, we train a robot policy using the GR-1 framework. Full implementation deta
 
 - [x] Data release.
 - [x] Code and instruction for data generation.
-- [ ] Code and instruction for model training&evaluation.
+- [x] Code and instruction for model training&evaluation.
 
 ## 😊 Acknowledgement
 
